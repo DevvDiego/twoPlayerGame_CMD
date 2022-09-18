@@ -6,24 +6,25 @@
 
 // https://cplusplus.com/forum/windows/204878/
 
-typedef struct _CONSOLE_FONT_INFOEX
-{
-    ULONG cbSize;
-    DWORD nFont;
-    COORD dwFontSize;
-    UINT  FontFamily;
-    UINT  FontWeight;
-    WCHAR FaceName[LF_FACESIZE];
-}CONSOLE_FONT_INFOEX, *PCONSOLE_FONT_INFOEX;
-//the function declaration begins
-#ifdef __cplusplus
-extern "C" {
-#endif
-BOOL WINAPI SetCurrentConsoleFontEx(HANDLE hConsoleOutput, BOOL bMaximumWindow, PCONSOLE_FONT_INFOEX
-lpConsoleCurrentFontEx);
-#ifdef __cplusplus
-}
-#endif
+/*Using mingw is neccessary to redefine, using mingw w64 is not*/
+// typedef struct _CONSOLE_FONT_INFOEX
+// {
+//     ULONG cbSize;
+//     DWORD nFont;
+//     COORD dwFontSize;
+//     UINT  FontFamily;
+//     UINT  FontWeight;
+//     WCHAR FaceName[LF_FACESIZE];
+// }CONSOLE_FONT_INFOEX, *PCONSOLE_FONT_INFOEX;
+// //the function declaration begins
+// #ifdef __cplusplus
+// extern "C" {
+// #endif
+// BOOL WINAPI SetCurrentConsoleFontEx(HANDLE hConsoleOutput, BOOL bMaximumWindow, PCONSOLE_FONT_INFOEX
+// lpConsoleCurrentFontEx);
+// #ifdef __cplusplus
+// }
+// #endif
 
 void SetFontSize(int type){
 	if(type==1){
@@ -103,11 +104,15 @@ void set_gameBoundaries(){
 class Player
 {
 	
-
     private:
         int actual_x=0;
         int actual_y=0;
 		int speed=1;
+
+		bool movingUp=false;
+		bool movingDown=false;
+		bool movingLeft=false;
+		bool movingRight=false;
 
     public:
 
@@ -135,11 +140,40 @@ class Player
 		printf(" ");
 	}
 
+
+	/**
+	 * Functions undraws and draws on the new location, taking care of the game borders
+	*/
 	void Move(){
-		gotoxy(actual_x,actual_y);
+		if(movingLeft){
+			UnDraw();
+			actual_x=actual_x+speed;
+			Draw();
+
+			
+		}else if(movingRight){
+
+			UnDraw();
+			actual_x=actual_x-speed;
+			Draw();
+
+
+		}else if(movingUp){
+
+			UnDraw();
+			actual_x=actual_y-speed;
+			Draw();
+
+
+		}else if(movingDown){
+
+			UnDraw();
+			actual_x=actual_y+speed;
+			Draw();
+
+			
+		}
 	}
-
-
 
 
 
@@ -152,7 +186,6 @@ class Player
 	void plus_Y(int y){
 		actual_y = actual_y+y;
 	}
-
 	void minus_X(int x){
 		actual_x = actual_x-x;
 	}
@@ -160,23 +193,59 @@ class Player
 		actual_y = actual_y-y;
 	}
 
+	//moving left
+	void set_ML(bool state){
+		this->movingLeft=state;
+	}
+	//moving right
+	void set_MR(bool state){
+		this->movingRight=state;
+	}
+	//moving Up
+	void set_MU(bool state){
+		this->movingUp=state;
+	}
+	//moving Down
+	void set_MD(bool state){
+		this->movingDown=state;
+	}
+
+
+
+
+
 
 	// getters
 	int retrieveActual_X(){
 		return this->actual_x;
 	}
-
 	int retrieveActual_Y(){
 		return this->actual_y;
 	}
-
 	int retrieveSpeed(){
 		return this->speed;
 	}
-
 	int retrieveCharacter(){
 		return 159;
 	}
+
+	//moving left
+	bool ML(){
+		return movingLeft;
+	}
+	//moving right
+	bool MR(){
+		return movingRight;
+	}
+	//moving up
+	bool MU(){
+		return movingUp;
+	}
+	//moving down
+	bool MD(){
+		return movingDown;
+	}
+
 };
 
 
@@ -195,77 +264,39 @@ int main(){
    	set_gameBoundaries();
 
 
-	Player player(40,10); //spawn point
+	Player player(104,10); //spawn point (x,y)
 
 
-	//Main thread? Here user controls the player
 	while(active){
+		//key codes https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+		
+		
+		//example taken from https://stackoverflow.com/questions/5523111/keypress-event-in-cs
 
-		//Player1 movement
-		if(kbhit()){
-			switch(getch()){
-				//To make the movement, we first erase the actual piece from where we are, and then make another one on the direction we get
-				case 119: //w
-					if( player.retrieveActual_Y() - player.retrieveSpeed() >0){
+		// if ((GetAsyncKeyState(VK_LEFT) < 0) != movingLeft) {
+		// 	movingLeft = !movingLeft;
+		// 	// gameObject->setVelocity(movingLeft ? -10 : 0);
+		// }
 
-						player.UnDraw();
-						player.minus_Y( player.retrieveSpeed() );
-						player.Move();
-						player.Draw();
-						
-						
-					}
-					break;
-
-				case 97: //a
-					if(player.retrieveActual_X() - player.retrieveSpeed() >4){
-						
-						player.UnDraw();
-						player.minus_X( player.retrieveSpeed() );
-						player.Move();
-						player.Draw();
-						
-						
-					}
-					break;
-
-				case 115: //s
-					if(player.retrieveActual_Y() + player.retrieveSpeed() <26){
-
-						player.UnDraw();
-						player.plus_Y( player.retrieveSpeed() );
-						player.Move();
-						player.Draw();
-						
-						
-					}
-					break;
-
-				case 100: //d
-					if(player.retrieveActual_X() + player.retrieveSpeed() <106){
-						
-						player.UnDraw();
-						player.plus_X( player.retrieveSpeed() );
-						player.Move();
-						player.Draw();
-						
-												
-					}
-					
-					break;
+		//to get rid of always getting the keyevent, we just set up a flag each time the key is pressed
+		if((GetAsyncKeyState(0x44) < 0) != player.ML() ){ //D key
+			player.set_ML( !player.ML() );
+			player.Move();
 
 
+		}else if((GetAsyncKeyState(0x41) < 0) != player.MR() ){ //A key
+			player.set_MR( !player.MR() );
+			player.Move();
 
-				case 27:
-					active=false;
-					
-					break;
-				default:
-					break;
-			}
+
+		}else if(GetKeyState(VK_ESCAPE) & 0x8000){
+			active=false;
 		}
+		
+	
 
 
+	//while bracket
 	};
 
 
