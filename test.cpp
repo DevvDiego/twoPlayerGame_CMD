@@ -3,6 +3,10 @@
 #include <windows.h>
 #include <cwchar>
 #include <thread>
+#include <mutex>
+
+
+std::mutex Mutex; //gets rid of the threads using printf when they should not
 
 // https://cplusplus.com/forum/windows/204878/
 
@@ -127,17 +131,21 @@ class Player
 	}
 
 	void Draw(){
+		Mutex.lock();
 		gotoxy(actual_x,actual_y);
 		printf("%c",79);
 		gotoxy(actual_x,actual_y-1);
 		printf("%c",179);
+		Mutex.unlock();
 	}
 
 	void UnDraw(){
+		Mutex.lock();
 		gotoxy(actual_x,actual_y);
 		printf(" ");
 		gotoxy(actual_x,actual_y-1);
 		printf(" ");
+		Mutex.unlock();
 	}
 
 
@@ -261,20 +269,10 @@ class Player
 
 
 
-
-int main(){
-	bool active=true;
-	// SetFontSize(1);
-	system("mode 110,27"); //sets cmd size to 100 columns and 25 rows
-	
-	system("cls");
-	ShowConsoleCursor(false);
-   	set_gameBoundaries();
-
-
+void initPlayer_1(){ //wasd keys player
 	Player player(90,10); //spawn point (x,y)
 
-
+	bool active=true;
 	while(active){
 		//key codes https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
 		
@@ -309,6 +307,83 @@ int main(){
 
 		}else if(GetKeyState(VK_ESCAPE) & 0x8000){
 			active=false;
+		}
+		
+	
+
+
+	//while bracket
+	};
+}
+
+
+void initPlayer_2(){ //arrow keys player
+	Player player(40,10); //spawn point (x,y)
+
+	bool active=true;
+	while(active){
+		//key codes https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+		
+		
+		//example taken from https://stackoverflow.com/questions/5523111/keypress-event-in-cs
+
+		// if ((GetAsyncKeyState(VK_LEFT) < 0) != movingLeft) {
+		// 	movingLeft = !movingLeft;
+		// 	// gameObject->setVelocity(movingLeft ? -10 : 0);
+		// }
+
+		//to get rid of always getting the keyevent, we just set up a flag each time the key is pressed
+		if((GetAsyncKeyState(VK_RIGHT) < 0) != player.ML() ){ //D key
+			player.set_ML( !player.ML() );
+			player.Move();
+
+		//to get rid of always getting the keyevent, we just set up a flag each time the key is pressed
+		}else if((GetAsyncKeyState(VK_LEFT) < 0) != player.MR() ){ //A key
+			player.set_MR( !player.MR() );
+			player.Move();
+
+		//to get rid of always getting the keyevent, we just set up a flag each time the key is pressed
+		}else if((GetAsyncKeyState(VK_UP) < 0) != player.MU() ){ //W key
+			player.set_MU( !player.MU() );
+			player.Move();
+
+		//to get rid of always getting the keyevent, we just set up a flag each time the key is pressed
+		}else if((GetAsyncKeyState(VK_DOWN) < 0) != player.MD() ){ //S key
+			player.set_MD( !player.MD() );
+			player.Move();
+
+
+		}else if(GetKeyState(VK_ESCAPE) & 0x8000){
+			active=false;
+		}
+		
+	
+
+
+	//while bracket
+	};
+}
+
+
+
+int main(){
+	
+	// SetFontSize(1);
+	system("mode 110,27"); //sets cmd size to 100 columns and 25 rows
+	
+	system("cls");
+	ShowConsoleCursor(false);
+   	set_gameBoundaries();
+
+	//init threads for each player
+	std::thread Player1(initPlayer_1);
+	std::thread Player2(initPlayer_2);
+
+	bool active=true;
+	while(active){
+		if(GetKeyState(VK_ESCAPE) & 0x8000){
+			active=false;
+			printf("MAIN THREAD ENDED");
 		}
 		
 	
