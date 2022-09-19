@@ -148,31 +148,36 @@ class Player
 	*/
 	void Move(){
 		if(movingLeft){
-			UnDraw();
-			actual_x=actual_x+speed;
-			Draw();
+			if(actual_x+speed<106){
+				UnDraw();
+				actual_x=actual_x+speed;
+				Draw();
+			}
+
 
 			
 		}else if(movingRight){
-
-			UnDraw();
-			actual_x=actual_x-speed;
-			Draw();
+			if(actual_x-speed>3){
+				UnDraw();
+				actual_x=actual_x-speed;
+				Draw();
+			}
 
 
 		}else if(movingUp){
-
-			UnDraw();
-			actual_y=actual_y-speed;
-
-			Draw();
+			if(actual_y-speed>1){
+				UnDraw();
+				actual_y=actual_y-speed;
+				Draw();
+			}
 
 		}else if(movingDown){
 
-			UnDraw();
-			actual_y=actual_y+speed;
-
-			Draw();
+			if(actual_y+speed<26){
+				UnDraw();
+				actual_y=actual_y+speed;
+				Draw();
+			}
 
 
 		}
@@ -267,7 +272,7 @@ int main(){
    	set_gameBoundaries();
 
 
-	Player player(104,10); //spawn point (x,y)
+	Player player(90,10); //spawn point (x,y)
 
 
 	while(active){
