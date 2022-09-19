@@ -107,7 +107,7 @@ class Player
     private:
         int actual_x=0;
         int actual_y=0;
-		int speed=1;
+		int speed=2;
 
 		bool movingUp=false;
 		bool movingDown=false;
@@ -122,7 +122,7 @@ class Player
 		actual_y = y_Spawnpoint;
 
 		UnDraw();
-		gotoxy(actual_x,actual_y);
+
 		Draw();
 	}
 
@@ -143,6 +143,8 @@ class Player
 
 	/**
 	 * Functions undraws and draws on the new location, taking care of the game borders
+	 * 
+	 * Not necessary the use of gotocy, draw and undraw already took care of it
 	*/
 	void Move(){
 		if(movingLeft){
@@ -161,17 +163,18 @@ class Player
 		}else if(movingUp){
 
 			UnDraw();
-			actual_x=actual_y-speed;
-			Draw();
+			actual_x=actual_x-speed;
 
+			Draw();
 
 		}else if(movingDown){
 
 			UnDraw();
-			actual_x=actual_y+speed;
+			actual_x=actual_x+speed;
+
 			Draw();
 
-			
+
 		}
 	}
 
@@ -286,6 +289,11 @@ int main(){
 
 		}else if((GetAsyncKeyState(0x41) < 0) != player.MR() ){ //A key
 			player.set_MR( !player.MR() );
+			player.Move();
+
+
+		}else if((GetAsyncKeyState(0x57) < 0) != player.MU() ){ //W key
+			player.set_MU( !player.MU() );
 			player.Move();
 
 
