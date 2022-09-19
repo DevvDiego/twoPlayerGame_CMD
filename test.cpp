@@ -163,14 +163,14 @@ class Player
 		}else if(movingUp){
 
 			UnDraw();
-			actual_x=actual_x-speed;
+			actual_y=actual_y-speed;
 
 			Draw();
 
 		}else if(movingDown){
 
 			UnDraw();
-			actual_x=actual_x+speed;
+			actual_y=actual_y+speed;
 
 			Draw();
 
@@ -294,6 +294,11 @@ int main(){
 
 		}else if((GetAsyncKeyState(0x57) < 0) != player.MU() ){ //W key
 			player.set_MU( !player.MU() );
+			player.Move();
+
+
+		}else if((GetAsyncKeyState(0x53) < 0) != player.MD() ){ //S key
+			player.set_MD( !player.MD() );
 			player.Move();
 
 
