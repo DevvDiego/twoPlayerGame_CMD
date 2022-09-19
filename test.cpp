@@ -286,17 +286,17 @@ int main(){
 			player.set_ML( !player.ML() );
 			player.Move();
 
-
+		//to get rid of always getting the keyevent, we just set up a flag each time the key is pressed
 		}else if((GetAsyncKeyState(0x41) < 0) != player.MR() ){ //A key
 			player.set_MR( !player.MR() );
 			player.Move();
 
-
+		//to get rid of always getting the keyevent, we just set up a flag each time the key is pressed
 		}else if((GetAsyncKeyState(0x57) < 0) != player.MU() ){ //W key
 			player.set_MU( !player.MU() );
 			player.Move();
 
-
+		//to get rid of always getting the keyevent, we just set up a flag each time the key is pressed
 		}else if((GetAsyncKeyState(0x53) < 0) != player.MD() ){ //S key
 			player.set_MD( !player.MD() );
 			player.Move();
