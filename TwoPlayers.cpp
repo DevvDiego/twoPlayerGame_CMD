@@ -152,7 +152,7 @@ class Player
 	/**
 	 * Functions undraws and draws on the new location, taking care of the game borders
 	 * 
-	 * Not necessary the use of gotocy, draw and undraw already took care of it
+	 * Not necessary the use of gotoxy, draw and undraw already took care of it
 	*/
 	void Move(){
 		if(movingLeft){
